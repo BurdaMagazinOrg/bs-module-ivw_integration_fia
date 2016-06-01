@@ -1,0 +1,9 @@
+name: IVW Tracking (FIA)
+type: module
+description: 'IVW (SZM 2) tracking FIA extension'
+package: Tracking
+core: 8.x
+
+dependencies:
+  - ivw_integration
+  - fb_instant_articles

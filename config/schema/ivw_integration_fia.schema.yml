@@ -1,0 +1,7 @@
+ivw_integration_fia.settings:
+  type: mapping
+  label: 'IVW Settings (FIA)'
+  mapping:
+    fia_domain_prefix:
+      type: string
+      label: Domain prefix from which the IVW iFrame will be displayed (protocol + domain)

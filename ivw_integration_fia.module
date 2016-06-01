@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implements hook_theme().
+ */
+function ivw_integration_fia_theme() {
+  return array(
+    'ivw_fia' => array(
+      'template' => 'ivw-fia',
+      'variables' => array(
+        'fia_frame_url' => NULL,
+      )
+    ),
+  );
+}
