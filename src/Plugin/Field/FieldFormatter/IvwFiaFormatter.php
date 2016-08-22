@@ -84,7 +84,7 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
           'st' => $this->configFactory->get('ivw_integration.settings')->get('site'), // maybe use mew value here?
           'cp' => $this->tokenService ->replace(
             $this->configFactory->get('ivw_integration.settings')->get('code_template'),
-            array('entity' => $item->entity),
+            array('entity' => $items->getEntity()),
             array('sanitize' => FALSE)
           )
         )
