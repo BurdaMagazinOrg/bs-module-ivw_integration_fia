@@ -8,7 +8,9 @@
     var match,
             pl     = /\+/g,
             search = /([^&=]+)=?([^&]*)/g,
-            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            decode = function (s) {
+                return decodeURIComponent(s.replace(pl, " "));
+            },
             query  = window.location.search.substring(1);
 
     var iam_data = {};

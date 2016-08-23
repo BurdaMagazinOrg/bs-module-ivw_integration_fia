@@ -4,12 +4,12 @@
  * Implements hook_theme().
  */
 function ivw_integration_fia_theme() {
-  return array(
-    'ivw_fia' => array(
+  return [
+    'ivw_fia' => [
       'template' => 'ivw-fia',
-      'variables' => array(
+      'variables' => [
         'fia_frame_url' => NULL,
-      )
-    ),
-  );
+      ],
+    ],
+  ];
 }
