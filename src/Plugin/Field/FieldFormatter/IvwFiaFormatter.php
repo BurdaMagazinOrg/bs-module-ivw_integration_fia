@@ -163,7 +163,7 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
           array(
             'st' => $this->configFactory->get('ivw_integration.settings')->get(
               'mobile_site'
-            ), // maybe use mew value here?
+            ),
             'cp' => $this->tokenService->replace(
               $this->configFactory->get('ivw_integration.settings')->get(
                 'code_template'
