@@ -7,14 +7,17 @@
 
 namespace Drupal\ivw_integration_fia\Plugin\Field\FieldFormatter;
 
+use Drupal\Component\Render\HtmlEscapedText;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Utility\Token;
 use Drupal\ivw_integration\IvwLookupServiceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use ReflectionClass;
 
 /**
  * Plugin implementation of the 'ivw_fia_formatter' formatter.
@@ -64,9 +67,10 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
    *   Any third party settings.
    * @param \Drupal\ivw_integration\IvwLookupServiceInterface $ivwLookupService
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\Core\Utility\Token $token
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, 
-                              IvwLookupServiceInterface $ivwLookupService, ConfigFactoryInterface $configFactory, Token $token) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings,
+    IvwLookupServiceInterface $ivwLookupService, ConfigFactoryInterface $configFactory, Token $token) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->ivwLookupService = $ivwLookupService;
     $this->configFactory = $configFactory;
@@ -79,16 +83,25 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
   public function viewElements(FieldItemListInterface $items, $langcode = NULL) {
     $elements = array();
     $fiaDomainPrefix = $this->configFactory->get('ivw_integration_fia.settings')->get('fia_domain_prefix');
+
+    // core token devs don't like the concept of callable
+    // getting the method of the static class as closure keeps the callback overridable by subclasses
+    $class = new ReflectionClass(static::class);
+    $callback = $class->getMethod('alterReplacements')->getClosure();
+
     foreach ($items as $delta => $item) {
       $url = $fiaDomainPrefix . '?' . http_build_query(array(
-          'st' => $this->configFactory->get('ivw_integration.settings')->get('site'), // maybe use mew value here?
-          'cp' => $this->tokenService ->replace(
-            $this->configFactory->get('ivw_integration.settings')->get('code_template'),
-            array('entity' => $items->getEntity()),
-            array('sanitize' => FALSE)
+            'st' => $this->configFactory->get('ivw_integration.settings')->get('mobile_site'), // maybe use mew value here?
+            'cp' => $this->tokenService ->replace(
+              $this->configFactory->get('ivw_integration.settings')->get('code_template'),
+              ['entity' => $items->getEntity()],
+              [
+                'sanitize' => FALSE,
+                'callback' => $callback,
+              ]
+            )
           )
-        )
-      );
+        );
 
       $elements[$delta] = array(
         '#theme' => 'ivw_fia',
@@ -98,6 +111,9 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
     return $elements;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $plugin_id,
@@ -111,6 +127,25 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
       $container->get('config.factory'),
       $container->get('token')
     );
+  }
+
+  /**
+   * Helper callback that alters returned token replacements.
+   *
+   * This is needed as we always want "delivery" ("D") set to "2" with FBIA,
+   * but there is no way to configure this outside of the node / term config
+   * hierarchy.
+   *
+   * @param array $replacements
+   * @param array $data
+   * @param array $options
+   * @param \Drupal\Core\Render\BubbleableMetadata|NULL $bubbleable_metadata
+   */
+  public static function alterReplacements(array &$replacements, array $data = array(), array $options = array(), BubbleableMetadata $bubbleable_metadata = NULL) {
+    if (isset($replacements['[ivw:delivery]'])) {
+      // Token calls the callback after escaping the replacements...
+      $replacements['[ivw:delivery]'] = new HtmlEscapedText('2');
+    }
   }
 
 
