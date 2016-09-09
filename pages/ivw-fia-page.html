@@ -14,11 +14,12 @@
             query  = window.location.search.substring(1);
 
     var iam_data = {};
+    iam_data.sv = 'ke';
     while (match = search.exec(query)) {
         iam_data[decode(match[1])] = decode(match[2]);
     }
+    iam_data.fb = 1;
     iom.c(iam_data, 1);
-    window.console && console.log(iam_data);
 </script>
 </body>
 </html>
