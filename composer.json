@@ -1,0 +1,7 @@
+
+{
+    "name": "burdamagazinorg/ivw_integration_fia",
+    "type": "drupal-module",
+    "minimum-stability": "dev",
+    "require": {}
+}
