@@ -164,7 +164,7 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
             'st' => $this->configFactory->get('ivw_integration.settings')->get(
               'mobile_site'
             ),
-            'cp' => $this->tokenService->replace(
+            'cp' => 'fbia-' . $this->tokenService->replace(
               $this->configFactory->get('ivw_integration.settings')->get(
                 'code_template'
               ),
