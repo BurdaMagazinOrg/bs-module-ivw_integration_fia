@@ -12,6 +12,7 @@
                 return decodeURIComponent(s.replace(pl, " "));
             },
             query  = window.location.search.substring(1);
+            query = query.replace('&amp;', '&');
 
     var iam_data = {};
     iam_data.sv = 'ke';
