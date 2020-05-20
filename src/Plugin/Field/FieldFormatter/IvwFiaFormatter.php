@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\ivw_integration\Plugin\Field\FieldFormatter\IvwEmptyFormatter.
- */
-
 namespace Drupal\ivw_integration_fia\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Render\HtmlEscapedText;
@@ -34,16 +29,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The IVW lookup service interface.
+   *
    * @var \Drupal\ivw_integration\IvwLookupServiceInterface
    */
   protected $ivwLookupService;
 
   /**
+   * The config factory interface.
+   *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
+   * The token utility.
+   *
    * @var \Drupal\Core\Utility\Token
    */
   protected $tokenService;
@@ -66,8 +67,11 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
    * @param array $third_party_settings
    *   Any third party settings.
    * @param \Drupal\ivw_integration\IvwLookupServiceInterface $ivwLookupService
+   *   The IVW lookup service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
    * @param \Drupal\Core\Utility\Token $token
+   *   The token.
    */
   public function __construct(
     $plugin_id,
@@ -126,9 +130,13 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
    * hierarchy.
    *
    * @param array $replacements
+   *   Replacements as an array.
    * @param array $data
+   *   Data as an array.
    * @param array $options
-   * @param \Drupal\Core\Render\BubbleableMetadata|NULL $bubbleable_metadata
+   *   Options as an array.
+   * @param \Drupal\Core\Render\BubbleableMetadata|null $bubbleable_metadata
+   *   Bubbleable metadata or null.
    */
   public static function alterReplacements(
     array &$replacements,
@@ -153,14 +161,15 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
     $fiaDomainPrefix = $this->configFactory->get('ivw_integration_fia.settings')
       ->get('fia_domain_prefix');
 
-    // core token devs don't like the concept of callable
-    // getting the method of the static class as closure keeps the callback overridable by subclasses
+    // Core token devs don't like the concept of callable.
+    // Getting the method of the static class as closure keeps
+    // the callback overridable by subclasses.
     $class = new ReflectionClass(static::class);
     $callback = $class->getMethod('alterReplacements')->getClosure();
 
     foreach ($items as $delta => $item) {
       $url = $fiaDomainPrefix . '?' . http_build_query(
-          array(
+          [
             'st' => $this->configFactory->get('ivw_integration.settings')->get(
               'mobile_site'
             ),
@@ -174,7 +183,7 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
                 'callback' => $callback,
               ]
             ),
-          )
+          ]
         );
 
       $elements[$delta] = [
@@ -184,6 +193,5 @@ class IvwFiaFormatter extends FormatterBase implements ContainerFactoryPluginInt
     }
     return $elements;
   }
-
 
 }
